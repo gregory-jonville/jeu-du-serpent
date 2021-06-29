@@ -1,30 +1,28 @@
-window.onload = function() {
+window.onload = function () {
+  var canvas;
+  var ctx;
+  var delay = 100;
+  var xCoord = 0;
+  var yCoord = 0;
 
-    var canvas;
-    var snk;
-    var delay = 100;
-    var xCoord = 0;
-    var yCoord = 0;
+  init();
 
-    init();
-
-    function init() {
+  function init() {
     canvas = document.createElement('canvas');
     canvas.width = 900;
     canvas.height = 600;
     canvas.style.border = "1px solid";
     document.body.appendChild(canvas);
-snk = canvas.getContext('2d');
-refreshSnake();
-    
-    }
+    ctx = canvas.getContext('2d');
+    refreshSnake();
+  }
 
-    function refreshSnake() {
-        xCoord += 2;
-        yCoord += 2;
-    snk.fillStyle = "blue";
-    snk.clearRect(0,0,canvas.width, canvas.height);
-    snk.fillRect(xCoord, yCoord, 100, 50);
+  function refreshSnake() {
+    xCoord += 5;
+    yCoord += 5;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "red";
+    ctx.fillRect(xCoord, yCoord, 100, 50);
     setTimeout(refreshSnake, delay);
-    }
+  }
 }
