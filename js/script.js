@@ -28,4 +28,10 @@ window.onload = function () {
     setTimeout(refreshSnake, delay); // Permet d'exécuter la fonction "refreshSnake" suivant le délai "delay" indiqué
   }
 
+  function drawBlock(ctx, position) {
+    var x = position[0] * blockSize; // Attribution de la position du bloc sur l'axe x
+    var y = position[1] * blockSize; // Attribution de la position du bloc sur l'axe y
+    ctx.fillRect(x, y, blockSize, blockSize); // Attribution de la position du canvas => x = coordonnée sur l'axe des x du point de départ du rectangle, y = coordonnée sur l'axe des y du point de départ du rectangle, blockSize = taille du bloc sur l'axe x, blockSize = taille du bloc sur l'axe y. Cela représente la partie visible du canvas
+  }
+
 }
