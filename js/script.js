@@ -22,4 +22,10 @@ window.onload = function () {
     ]);
     refreshSnake(); // Appel de fct
   }
+
+  function refreshSnake() {
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Attribution de la position du canvas => x = coordonnée sur l'axe des x du point de départ du rectangle, y = coordonnée sur l'axe des y du point de départ du rectangle, canvasWidth = Largeur du canvas, canvasHeight = Hauteur du canvas. Cela représente la partie invisible de la position du canvas
+    setTimeout(refreshSnake, delay); // Permet d'exécuter la fonction "refreshSnake" suivant le délai "delay" indiqué
+  }
+
 }
