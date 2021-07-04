@@ -6,6 +6,8 @@ window.onload = function () {
   var delay = 100; //délais
   var snak; // Variable du serpent
   var apple;
+  var withInBlocks = canvasWidth / blockSize;
+  var heightInBlocks = canvasHeight / blockSize;
 
   init(); // Appel de la fonction init
   console.log(init);
@@ -31,11 +33,16 @@ window.onload = function () {
   }
 
   function refreshSnake() {
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Attribution de la position du canvas => x = coordonnée sur l'axe des x du point de départ du rectangle, y = coordonnée sur l'axe des y du point de départ du rectangle, canvasWidth = Largeur du canvas, canvasHeight = Hauteur du canvas. Cela représente la partie invisible de la position du canvas
     snak.advance(); // Appel de la méthode "advance"
-    snak.draw(); // Appel de la méthode "draw"
-    apple.draw();
-    setTimeout(refreshSnake, delay); // Permet d'exécuter la fonction "refreshSnake" suivant le délai "delay" indiqué
+
+    if (snak.checkColision()) {
+      /* GAME OVER */
+    } else {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Attribution de la position du canvas => x = coordonnée sur l'axe des x du point de départ du rectangle, y = coordonnée sur l'axe des y du point de départ du rectangle, canvasWidth = Largeur du canvas, canvasHeight = Hauteur du canvas. Cela représente la partie invisible de la position du canvas
+      snak.draw(); // Appel de la méthode "draw"
+      apple.draw();
+      setTimeout(refreshSnake, delay); // Permet d'exécuter la fonction "refreshSnake" suivant le délai "delay" indiqué
+    }
   }
 
   function drawBlock(ctx, position) {
@@ -103,22 +110,48 @@ window.onload = function () {
         this.direction = newDirection;
       }
     };
+    this.checkColision = function () {
+      var wallCollision = false;
+      var snakeCollision = false;
+      var head = this.body[0];
+      var rest = this.body.slice(1);
+      var snakeX = head[0];
+      var snakeY = head[1];
+      var minX = 0;
+      var minY = 0;
+      var maxX = withInBlocks - 1;
+      var maxY = withInBlocks - 1;
+      var isNotInCanvasByX = snakeX < minX || snakeX > maxX;
+      var isNotInCanvasByY = snakeY < minY || snakeY > maxY;
+
+      if (isNotInCanvasByX || isNotInCanvasByY) {
+        wallCollision = true;
+      }
+
+      for (var i = 0; i < rest.length; ++i) {
+        if (snakeX === rest[i][0] && snakeY === rest[i][0]) {
+          snakeCollision = true;
+        }
+      }
+      return wallCollision || snakeCollision;
+    };
   }
 
-  function Apple(position) { // fct const de la pomme
+  function Apple(position) {
+    // fct const de la pomme
     this.position = position; // Position de la pomme
-    this.draw = function(){
+    this.draw = function () {
       ctx.save();
       ctx.fillStyle = "green";
-      ctx.beginPath();
-      var radius = blockSize/2;
-      var x = position[0]*blockSize + radius;
-      var y = position[1]*blockSize + radius;
-      ctx.arc(x,y,radius,0,Math.PI*2, true);
-      ctx.fill();
+      ctx.beginPath(); // Permet de changer les propriétés du contexte
+      var radius = blockSize / 2; // Rayon du cercle
+      var x = position[0] * blockSize + radius;
+      var y = position[1] * blockSize + radius;
+      ctx.arc(x, y, radius, 0, Math.PI * 2, true); // Création du cercle
+      ctx.fill(); // Remplissage du cercle
 
       ctx.restore();
-    }
+    };
   }
 
   document.onkeydown = function handleKeyDown(e) {
