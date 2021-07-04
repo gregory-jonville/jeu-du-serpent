@@ -10,7 +10,7 @@ window.onload = function () {
   var heightInBlocks = canvasHeight / blockSize;
 
   init(); // Appel de la fonction init
-  console.log(init);
+  
   function init() {
     // Fonction d'initialisation du serpent
     var canvas = document.createElement("canvas"); // Création de l'élément "canvas"
@@ -38,8 +38,16 @@ window.onload = function () {
     if (snak.checkColision()) {
       /* GAME OVER */
     } else {
+      if (snak.isEatingApple(apple)) {
+        snak.ateApple = true;
+        do {
+          apple.setNewPosition();
+        }
+        while(apple.isOnSnake(snak))
+        
+      }
       ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Attribution de la position du canvas => x = coordonnée sur l'axe des x du point de départ du rectangle, y = coordonnée sur l'axe des y du point de départ du rectangle, canvasWidth = Largeur du canvas, canvasHeight = Hauteur du canvas. Cela représente la partie invisible de la position du canvas
-      snak.draw(); // Appel de la méthode "draw"
+      snak.draw(); // Appel de la méthode "draw" Serpent et pomme
       apple.draw();
       setTimeout(refreshSnake, delay); // Permet d'exécuter la fonction "refreshSnake" suivant le délai "delay" indiqué
     }
@@ -54,6 +62,7 @@ window.onload = function () {
     // fct constructeur du serpent
     this.body = body; // Corps du serpent
     this.direction = direction; // Direction du snake
+    this.ateApple = false;
     this.draw = function () {
       // Méthode qui permet de dessiner le corps du serpent
       ctx.save(); // Sauvegarde du contexte du canvas
@@ -67,7 +76,7 @@ window.onload = function () {
     this.advance = function () {
       // Création de la méthode "advance"
       var nextPosition = this.body[0].slice(); // Nouvelle position avec copie de l'élément avec la fonction "slice"
-      console.log(nextPosition);
+      
       switch (
         this.direction // Conditions de direction
       ) {
@@ -87,7 +96,13 @@ window.onload = function () {
           throw "Vous allez droit dans le mur !"; // Renvoie un message d'erreur
       }
       this.body.unshift(nextPosition); // Ajouter le nextposition à la balise "body" grace à la fct "unshift"
-      this.body.pop(); // Supprime le dernier élément d'un Array
+      if (!this.ateApple){
+        this.body.pop(); // Supprime le dernier élément d'un Array
+      } else {
+        this.ateApple = false;
+      }
+      
+      
     };
 
     this.setDirection = function (newDirection) {
@@ -115,12 +130,12 @@ window.onload = function () {
       var snakeCollision = false;
       var head = this.body[0];
       var rest = this.body.slice(1);
-      var snakeX = head[0];
+      var snakeX = head[0]; // Coords de la tête
       var snakeY = head[1];
-      var minX = 0;
-      var minY = 0;
-      var maxX = withInBlocks - 1;
-      var maxY = withInBlocks - 1;
+      var minX = 0; // limite mini X
+      var minY = 0; // limite mini Y
+      var maxX = withInBlocks - 1; // Nb de blocs verticaux
+      var maxY = heightInBlocks - 1; // Nb de blocs horizontaux
       var isNotInCanvasByX = snakeX < minX || snakeX > maxX;
       var isNotInCanvasByY = snakeY < minY || snakeY > maxY;
 
@@ -128,13 +143,24 @@ window.onload = function () {
         wallCollision = true;
       }
 
-      for (var i = 0; i < rest.length; ++i) {
+      for (var i = 0; i < rest.length; ++i) { // on parcoure le corps du serpent
         if (snakeX === rest[i][0] && snakeY === rest[i][0]) {
           snakeCollision = true;
         }
       }
       return wallCollision || snakeCollision;
     };
+
+    this.isEatingApple = function(appleEat){
+      var head = this.body[0];
+
+      if(head[0] === appleEat.position[0] && head[1] === appleEat.position[1]){
+        return true;
+      } else {
+        return false;
+      }
+    };
+
   }
 
   function Apple(position) {
@@ -145,13 +171,28 @@ window.onload = function () {
       ctx.fillStyle = "green";
       ctx.beginPath(); // Permet de changer les propriétés du contexte
       var radius = blockSize / 2; // Rayon du cercle
-      var x = position[0] * blockSize + radius;
-      var y = position[1] * blockSize + radius;
+      var x = this.position[0] * blockSize + radius;
+      var y = this.position[1] * blockSize + radius;
       ctx.arc(x, y, radius, 0, Math.PI * 2, true); // Création du cercle
       ctx.fill(); // Remplissage du cercle
 
       ctx.restore();
     };
+    this.setNewPosition = function(){ // nouvelle position de la pomme quand elle est mangée
+      var newX = Math.round(Math.random() * (withInBlocks - 1)); // on choisi un chiffre aléatoire 
+      var newY = Math.round(Math.random() * (heightInBlocks - 1));
+      this.position = [newX, newY];
+    }
+    this.isOnSnake = function(snakeToCheck) { // Verification que la pomme ne soit pas sur le corps du serpent
+      var isOnSnake = false;
+
+      for(var i = 0; i < snakeToCheck.body.length; i++){ // Vérification
+        if(this.position[0] === snakeToCheck.body[i][0] && this.position[1] === snakeToCheck.body[i][1]) {
+          isOnSnake = true;
+        }
+      }
+return isOnSnake;
+    }
   }
 
   document.onkeydown = function handleKeyDown(e) {
