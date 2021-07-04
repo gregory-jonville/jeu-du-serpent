@@ -5,6 +5,7 @@ window.onload = function () {
   var ctx; // contexte
   var delay = 100; //délais
   var snak; // Variable du serpent
+  var apple;
 
   init(); // Appel de la fonction init
   console.log(init);
@@ -25,6 +26,7 @@ window.onload = function () {
       ],
       "right"
     );
+    apple = new Apple([10, 10]); // fct const de la pomme
     refreshSnake(); // Appel de fct
   }
 
@@ -32,6 +34,7 @@ window.onload = function () {
     ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Attribution de la position du canvas => x = coordonnée sur l'axe des x du point de départ du rectangle, y = coordonnée sur l'axe des y du point de départ du rectangle, canvasWidth = Largeur du canvas, canvasHeight = Hauteur du canvas. Cela représente la partie invisible de la position du canvas
     snak.advance(); // Appel de la méthode "advance"
     snak.draw(); // Appel de la méthode "draw"
+    apple.draw();
     setTimeout(refreshSnake, delay); // Permet d'exécuter la fonction "refreshSnake" suivant le délai "delay" indiqué
   }
 
@@ -41,7 +44,7 @@ window.onload = function () {
     ctx.fillRect(x, y, blockSize, blockSize); // Attribution de la position du canvas => x = coordonnée sur l'axe des x du point de départ du rectangle, y = coordonnée sur l'axe des y du point de départ du rectangle, blockSize = taille du bloc sur l'axe x, blockSize = taille du bloc sur l'axe y. Cela représente la partie visible du canvas
   }
   function Snake(body, direction) {
-    // fct constructeur
+    // fct constructeur du serpent
     this.body = body; // Corps du serpent
     this.direction = direction; // Direction du snake
     this.draw = function () {
@@ -102,21 +105,37 @@ window.onload = function () {
     };
   }
 
+  function Apple(position) { // fct const de la pomme
+    this.position = position; // Position de la pomme
+    this.draw = function(){
+      ctx.save();
+      ctx.fillStyle = "green";
+      ctx.beginPath();
+      var radius = blockSize/2;
+      var x = position[0]*blockSize + radius;
+      var y = position[1]*blockSize + radius;
+      ctx.arc(x,y,radius,0,Math.PI*2, true);
+      ctx.fill();
+
+      ctx.restore();
+    }
+  }
+
   document.onkeydown = function handleKeyDown(e) {
     // Evênement (e) quand l'user appuie sur une touche
     var key = e.keyCode; // Code de la touche qui a été appuyée
     var newDirection;
     switch (key) {
-      case 37: // flêche gauche
+      case 37: // flèche gauche
         newDirection = "left";
         break;
-      case 38: // flêche du haut
+      case 38: // flèche du haut
         newDirection = "up";
         break;
-      case 39: // flêche droite
+      case 39: // flèche droite
         newDirection = "right";
         break;
-      case 40: // flêche du bas
+      case 40: // flèche du bas
         newDirection = "down";
         break;
       default:
